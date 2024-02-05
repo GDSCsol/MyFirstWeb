@@ -3,6 +3,9 @@ package org.example.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "AUTHORITY")
 @Getter
@@ -19,5 +22,8 @@ public class Authority {
 
     @Column(name = "name", length = 50)
     private String name;
+
+    @OneToMany(mappedBy = "authority", cascade = CascadeType.ALL)
+    private Set<UserAuthority> Users = new HashSet<>();
 
 }

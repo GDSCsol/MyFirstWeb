@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class User {
     @Column(name = "activated")
     private boolean activated;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserAuthority> authorities = new ArrayList<UserAuthority>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserAuthority> authorities = new HashSet<>();
 
 }
