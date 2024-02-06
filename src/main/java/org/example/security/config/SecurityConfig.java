@@ -35,6 +35,4 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toH2Console());
     }
 
-
-
 }
