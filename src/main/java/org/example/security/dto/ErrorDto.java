@@ -1,4 +1,4 @@
-package org.example.security.config;
+package org.example.security.dto;
 
 import java.util.ArrayList;
 import java.util.List;
