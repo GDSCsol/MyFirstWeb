@@ -1,4 +1,4 @@
-package org.example.security.config.handler;
+package org.example.security.handler;
 
 import org.example.security.dto.ErrorDto;
 import org.springframework.core.Ordered;
