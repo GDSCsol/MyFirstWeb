@@ -22,7 +22,7 @@ public class UserAuthority {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "authority_id")
+    @JoinColumn(name = "authority_name")
     private Authority authority;
 
 }

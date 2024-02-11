@@ -37,4 +37,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserAuthority> authorities = new HashSet<>();
 
+    public void addUserAuthority(UserAuthority userAuthority) {
+        userAuthority.setUser(this);
+        this.authorities.add(userAuthority);
+    }
+
 }

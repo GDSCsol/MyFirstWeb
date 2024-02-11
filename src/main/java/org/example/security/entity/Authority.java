@@ -16,12 +16,9 @@ import java.util.Set;
 public class Authority {
 
     @Id
-    @GeneratedValue
-    @Column(name = "authority_id")
-    private Long id;
-
-    @Column(name = "name", length = 50)
-    private String name;
+    @Column(name = "authority_name", length = 50)
+    @Enumerated(EnumType.STRING)
+    private AuthorityEnum authorityEnum;
 
     @OneToMany(mappedBy = "authority", cascade = CascadeType.ALL)
     private Set<UserAuthority> Users = new HashSet<>();
