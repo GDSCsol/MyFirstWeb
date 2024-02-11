@@ -1,9 +1,11 @@
-package org.example.security.Service;
+package org.example.security.service;
 
 import io.jsonwebtoken.lang.Collections;
 import org.example.security.dto.UserDto;
 import org.example.security.entity.Authority;
 import org.example.security.entity.User;
+import org.example.security.exception.DuplicateMemberException;
+import org.example.security.exception.NotFoundMemberException;
 import org.example.security.repository.UserRepository;
 import org.example.security.util.SecurityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,6 +1,6 @@
 package org.example.security.controller;
 
-import org.example.security.Service.UserService;
+import org.example.security.service.UserService;
 import org.example.security.dto.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
