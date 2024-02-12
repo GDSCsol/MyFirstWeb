@@ -3,22 +3,30 @@ package org.example.security.service;
 import io.jsonwebtoken.lang.Collections;
 import org.example.security.dto.UserDto;
 import org.example.security.entity.Authority;
+import org.example.security.entity.AuthorityEnum;
 import org.example.security.entity.User;
+import org.example.security.entity.UserAuthority;
 import org.example.security.exception.DuplicateMemberException;
 import org.example.security.exception.NotFoundMemberException;
+import org.example.security.repository.UserAuthorityRepository;
 import org.example.security.repository.UserRepository;
 import org.example.security.util.SecurityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final UserAuthorityRepository userAuthorityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserAuthorityRepository userAuthorityRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userAuthorityRepository = userAuthorityRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -29,17 +37,25 @@ public class UserService {
         }
 
         Authority authority = Authority.builder()
-                // Todo 유저 권한 설정 ('ROLE_USER')
+                .authorityEnum(AuthorityEnum.ROLE_USER)
                 .build();
 
         User user = User.builder()
                 .name(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
-                .authorities(Collections.singleton(authority))
+                .authorities(new HashSet<>())
                 .activated(true)
                 .build();
 
+        UserAuthority userAuthority = UserAuthority.builder()
+                .user(user)
+                .authority(authority)
+                .build();
+
+        user.addUserAuthority(userAuthority);
+
+        userAuthorityRepository.save(userAuthority);
         return UserDto.from(userRepository.save(user));
     }
 
