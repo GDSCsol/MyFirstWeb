@@ -19,7 +19,7 @@ public class User {
 
     @Id
     @Column(name = "user_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", length = 50, unique = true)
