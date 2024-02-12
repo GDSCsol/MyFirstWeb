@@ -38,7 +38,7 @@ public class UserDto {
                 .username(user.getName())
                 .nickname(user.getNickname())
                 .authorityDtoSet(user.getAuthorities().stream()
-                        .map(authority -> AuthorityDto.builder().authorityName(authority.getAuthority().getName()).build()) // TODO: 2024-02-10 수정 필요가능성 있음 
+                        .map(authority -> AuthorityDto.builder().authorityName(authority.getAuthority().getAuthorityEnum().name()).build())
                         .collect(Collectors.toSet()))
                 .build();
     }
