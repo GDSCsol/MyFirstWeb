@@ -32,7 +32,7 @@ public class UserService {
 
     @Transactional
     public UserDto signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByName(userDto.getUsername()).orElse(null) != null) {
+        if (userRepository.findOneWithAuthoritiesByName(userDto.getName()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
 
@@ -41,7 +41,7 @@ public class UserService {
                 .build();
 
         User user = User.builder()
-                .name(userDto.getUsername())
+                .name(userDto.getName())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
                 .authorities(new HashSet<>())
