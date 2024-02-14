@@ -34,6 +34,7 @@ public class User {
     @Column(name = "activated")
     private boolean activated;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserAuthority> authorities = new HashSet<>();
 

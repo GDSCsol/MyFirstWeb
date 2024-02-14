@@ -20,6 +20,7 @@ public class Authority {
     @Enumerated(EnumType.STRING)
     private AuthorityEnum authorityEnum;
 
+    @Builder.Default
     @OneToMany(mappedBy = "authority", cascade = CascadeType.ALL)
     private Set<UserAuthority> Users = new HashSet<>();
 
