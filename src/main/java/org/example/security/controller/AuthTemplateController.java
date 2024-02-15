@@ -26,10 +26,16 @@ public class AuthTemplateController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    @GetMapping
-    public String index(Model model) {
-        return "index";
+    @GetMapping("/login")
+    public String login(Model model) {
+        return "login";
     }
+
+    @GetMapping("/signup")
+    public String signup(Model model) {
+        return "signup";
+    }
+
 
     @PostMapping("/authenticate")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
