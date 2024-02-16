@@ -37,7 +37,7 @@ public class UserService {
         }
 
         Authority authority = Authority.builder()
-                .authorityEnum(AuthorityEnum.USER)
+                .authorityEnum(AuthorityEnum.ROLE_USER)
                 .build();
 
         User user = User.builder()
