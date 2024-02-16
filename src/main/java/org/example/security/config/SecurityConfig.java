@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -79,6 +80,11 @@ public class SecurityConfig {
                 .formLogin((formLogin) -> formLogin
                         .loginPage("/login")
                         .defaultSuccessUrl("/"))
+
+                //로그아웃 설정
+                .logout((logout) -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/"))
 
                 .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
         return http.build();
