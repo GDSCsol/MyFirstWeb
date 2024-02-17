@@ -1,5 +1,7 @@
 package org.example.security.jwt;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.validation.constraints.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -13,6 +15,11 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class JwtFilter extends GenericFilterBean {
 
@@ -41,7 +48,13 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        Cookie[] cookies = request.getCookies();
+        String bearerToken = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(AUTHORIZATION_HEADER))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse("");
+        bearerToken = URLDecoder.decode(bearerToken, StandardCharsets.UTF_8);
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
