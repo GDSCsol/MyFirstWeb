@@ -76,16 +76,6 @@ public class SecurityConfig {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
 
-                // 로그인 url 설정
-                .formLogin((formLogin) -> formLogin
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/"))
-
-                //로그아웃 설정
-                .logout((logout) -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/"))
-
                 .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
         return http.build();
     }

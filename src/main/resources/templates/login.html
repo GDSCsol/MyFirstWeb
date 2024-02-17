@@ -7,8 +7,11 @@
                     <h5 class="card-title text-center">Login</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Your login form goes here -->
-                    <form method="post">
+
+                    <form method="post" th:action="@{/login}" th:object="${loginDto}">
+                        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                            <div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
+                        </div>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control" id="name" name="name" required>
@@ -19,6 +22,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Login</button>
                     </form>
+
                 </div>
             </div>
         </div>

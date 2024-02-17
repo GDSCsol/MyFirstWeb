@@ -32,7 +32,7 @@ public class AuthTemplateController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login(LoginDto loginDto) {
         return "login";
     }
 
@@ -47,10 +47,10 @@ public class AuthTemplateController {
 
         // TODO: 2024-02-17 쿠키저장안됌 
         // 쿠키저장
-        String jwt = userService.login(loginDto);
-        Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        cookie.setMaxAge(tokenValidityInSeconds);
-        response.addCookie(cookie);
+//        String jwt = userService.login(loginDto);
+//        Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+//        cookie.setMaxAge(tokenValidityInSeconds);
+//        response.addCookie(cookie);
 
         return "redirect:/";
     }
@@ -66,7 +66,6 @@ public class AuthTemplateController {
         if (bindingResult.hasErrors()) {
             return "signup";
         }
-        System.out.println("hii");
         userService.signup(userDto);
         return "redirect:/";
     }
