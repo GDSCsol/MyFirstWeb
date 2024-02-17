@@ -9,18 +9,18 @@
                 <div class="card-body">
 
                     <form method="post" th:action="@{/login}" th:object="${loginDto}">
-                        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
-                            <div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
-                        </div>
+                        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" th:field="*{name}" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" th:field="*{password}" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </div>
                     </form>
 
                 </div>

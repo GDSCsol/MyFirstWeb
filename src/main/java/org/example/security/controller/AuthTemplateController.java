@@ -21,9 +21,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @AllArgsConstructor
@@ -41,33 +45,40 @@ public class AuthTemplateController {
                             BindingResult bindingResult,
                             @Value("${jwt.token-validity-in-seconds}") int tokenValidityInSeconds,
                             HttpServletResponse response) {
-        if (bindingResult.hasErrors()) {
-            return "login";
+        try {
+            // 쿠키저장
+            String jwt = userService.login(loginDto);
+            String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
+            Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+            cookie.setMaxAge(tokenValidityInSeconds);
+            response.addCookie(cookie);
+            return "redirect:/";
+
+        } catch (Exception e) {
+            ObjectError error = new ObjectError("loginDto", e.getMessage());
+            bindingResult.addError(error);
         }
 
-        // TODO: 2024-02-17 쿠키저장안됌 
-        // 쿠키저장
-//        String jwt = userService.login(loginDto);
-//        Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-//        cookie.setMaxAge(tokenValidityInSeconds);
-//        response.addCookie(cookie);
-
-        return "redirect:/";
+        return "login";
     }
 
     @GetMapping("/signup")
-    public String signup(Model model) {
+    public String signup(UserDto userDto) {
         return "signup";
     }
 
     @PostMapping("/signup")
     public String signup(@Valid UserDto userDto,
                          BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "signup";
+        try {
+            userService.signup(userDto);
+            return "redirect:/";
+        } catch (Exception e) {
+            ObjectError error = new ObjectError("userDto", e.getMessage());
+            bindingResult.addError(error);
         }
-        userService.signup(userDto);
-        return "redirect:/";
+
+        return "signup";
     }
 
 }
