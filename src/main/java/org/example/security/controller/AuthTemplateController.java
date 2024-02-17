@@ -1,11 +1,16 @@
 package org.example.security.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.TokenDto;
+import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
 import org.example.security.jwt.TokenProvider;
+import org.example.security.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,12 +29,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 @AllArgsConstructor
 public class AuthTemplateController {
 
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final UserService userService;
 
     @GetMapping("/login")
     public String login(Model model) {
         return "login";
+    }
+
+    @PostMapping("/login")
+    public String authorize(@Valid LoginDto loginDto,
+                            BindingResult bindingResult,
+                            @Value("${jwt.token-validity-in-seconds}") int tokenValidityInSeconds,
+                            HttpServletResponse response) {
+        if (bindingResult.hasErrors()) {
+            return "login";
+        }
+
+        // TODO: 2024-02-17 쿠키저장안됌 
+        // 쿠키저장
+        String jwt = userService.login(loginDto);
+        Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        cookie.setMaxAge(tokenValidityInSeconds);
+        response.addCookie(cookie);
+
+        return "redirect:/";
     }
 
     @GetMapping("/signup")
@@ -36,22 +60,15 @@ public class AuthTemplateController {
         return "signup";
     }
 
-
-    @PostMapping("/login")
-    public ResponseEntity<TokenDto> authorize(@Valid LoginDto loginDto) {
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
-
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = tokenProvider.createToken(authentication);
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+    @PostMapping("/signup")
+    public String signup(@Valid UserDto userDto,
+                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "signup";
+        }
+        System.out.println("hii");
+        userService.signup(userDto);
+        return "redirect:/";
     }
 
 }

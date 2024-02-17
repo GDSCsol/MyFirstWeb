@@ -1,34 +1,24 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Sign Up</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="..." crossorigin="anonymous">
-</head>
-<body class="bg-light">
-<div class="container mt-5">
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<div layout:fragment="content" class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-primary text-white">
                     <h5 class="card-title text-center">Sign Up</h5>
                 </div>
                 <div class="card-body">
                     <!-- Your signup form goes here -->
                     <form method="post">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
-                        <div class="form-group">
-                            <label for="nickname">Nickname</label>
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">Nickname</label>
                             <input type="text" class="form-control" id="nickname" name="nickname" required>
                         </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
@@ -38,10 +28,4 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="..." crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="..." crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="..." crossorigin="anonymous"></script>
-</body>
 </html>

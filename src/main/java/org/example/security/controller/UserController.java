@@ -34,7 +34,8 @@ public class UserController {
     public ResponseEntity<UserDto> signup(
             @Valid @RequestBody UserDto userDto
     ) {
-        return ResponseEntity.ok(userService.signup(userDto));
+        userService.signup(userDto);
+        return ResponseEntity.ok(userDto);
     }
 
     @GetMapping("/user")
