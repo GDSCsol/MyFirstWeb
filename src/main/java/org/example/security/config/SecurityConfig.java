@@ -71,10 +71,15 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                // 로그인 로그아웃 폼 사용안함
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+
                 // enable h2-console
                 .headers(headers ->
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
+
 
                 .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
         return http.build();

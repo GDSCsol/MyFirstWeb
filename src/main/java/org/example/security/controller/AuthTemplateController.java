@@ -84,6 +84,17 @@ public class AuthTemplateController {
         return "signup";
     }
 
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        // 쿠키 제거
+        Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return "redirect:/";
+    }
+
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<UserDto> getMyUserInfo(HttpServletRequest request) {
