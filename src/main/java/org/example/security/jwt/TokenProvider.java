@@ -42,6 +42,7 @@ public class TokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Token -> Authentication
     public String createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -58,6 +59,7 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+    // Authentication -> Token
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts
                 .parser()
