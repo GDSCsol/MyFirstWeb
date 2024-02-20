@@ -6,41 +6,33 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.security.dto.LoginDto;
-import org.example.security.dto.TokenDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
-import org.example.security.jwt.TokenProvider;
 import org.example.security.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Controller
 @AllArgsConstructor
-public class AuthTemplateController {
+@RequestMapping("/jwt")
+public class JwtTemplateController {
 
     private final UserService userService;
 
+    @GetMapping
+    public String index() {return "jwt/jwt";}
+
     @GetMapping("/login")
     public String login(LoginDto loginDto) {
-        return "login";
+        return "jwt/login";
     }
 
     @PostMapping("/login")
@@ -54,6 +46,7 @@ public class AuthTemplateController {
             String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
             Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
             cookie.setMaxAge(tokenValidityInSeconds);
+            cookie.setPath("/");
             response.addCookie(cookie);
             return "redirect:/";
 
@@ -62,12 +55,12 @@ public class AuthTemplateController {
             bindingResult.addError(error);
         }
 
-        return "login";
+        return "jwt/login";
     }
 
     @GetMapping("/signup")
     public String signup(UserDto userDto) {
-        return "signup";
+        return "jwt/signup";
     }
 
     @PostMapping("/signup")
@@ -81,7 +74,7 @@ public class AuthTemplateController {
             bindingResult.addError(error);
         }
 
-        return "signup";
+        return "jwt/signup";
     }
 
     @PostMapping("/logout")

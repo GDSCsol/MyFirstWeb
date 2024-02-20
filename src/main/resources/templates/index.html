@@ -1,0 +1,12 @@
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<div layout:fragment="content" class="container mt-5">
+    <h1>Welcome</h1>
+    <div th:if="${#authorization.expression('isAuthenticated()')}">
+        <p th:text="'Hello, ' + ${#authentication.name} + '!'"></p>
+    </div>
+    <div th:unless="${#authorization.expression('isAuthenticated()')}">
+        <p>You are not authenticated. Please log in.</p>
+    </div>
+    <a th:href="@{/jwt}">JWT</a>
+</div>
+</html>
