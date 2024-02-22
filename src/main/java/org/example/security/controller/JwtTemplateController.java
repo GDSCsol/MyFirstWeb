@@ -45,6 +45,8 @@ public class JwtTemplateController {
             String jwt = userService.login(loginDto);
             String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
             Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+            // XSS 공격 방지용 http - only 옵션 적용
+            cookie.setHttpOnly(true);
             cookie.setMaxAge(tokenValidityInSeconds);
             cookie.setPath("/");
             response.addCookie(cookie);
@@ -53,12 +55,12 @@ public class JwtTemplateController {
         } catch (Exception e) {
             ObjectError error = new ObjectError("loginDto", e.getMessage());
             bindingResult.addError(error);
-        }
-
-        return "jwt/login";
+        }        return "jwt/login";
     }
 
     @GetMapping("/signup")
+
+
     public String signup(UserDto userDto) {
         return "jwt/signup";
     }
