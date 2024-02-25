@@ -1,0 +1,19 @@
+version: '1'
+
+services:
+  redis:
+    image: redis:alpine
+    command: redis-server /usr/local/etc/redis-refresh-token/redis.conf --requirepass password
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/refresh-token-data:/data
+      - ./data/refresh-token-data/redis.conf:/usr/local/etc/redis-refresh-token/redis.conf
+
+  spring:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spring:latest
+    ports:
+      - "8080:8080"
