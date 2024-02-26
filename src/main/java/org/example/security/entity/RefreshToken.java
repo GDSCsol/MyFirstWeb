@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class RefreshToken implements Serializable {
 
     @Id
-    private String id;
+    private String name;
 
     @Indexed // JPA를 사용하듯 findByAccessToken같은 질의 가능
     private String accessToken;
