@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.example.security.dto.AccessRefreshTokenDto;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
@@ -39,18 +40,26 @@ public class JwtTemplateController {
     @PostMapping("/login")
     public String authorize(@Valid LoginDto loginDto,
                             BindingResult bindingResult,
-                            @Value("${jwt.token-validity-in-seconds}") int tokenValidityInSeconds,
                             HttpServletResponse response) {
         try {
             // 쿠키저장
-            String jwt = userService.login(loginDto);
+            AccessRefreshTokenDto tokens = userService.login(loginDto);
+            String jwt = tokens.getAccessToken();
+            String rft = tokens.getRefreshToken();
+
             String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
-            Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+            Cookie jwtCookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
             // XSS 공격 방지용 http - only 옵션 적용
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(tokenValidityInSeconds);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            response.addCookie(jwtCookie);
+
+            Cookie rftCookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, rft);
+            // XSS 공격 방지용 http - only 옵션 적용
+            rftCookie.setHttpOnly(true);
+            rftCookie.setPath("/jwt/refresh");
+            response.addCookie(rftCookie);
+
             return "redirect:/";
 
         } catch (Exception e) {
@@ -60,8 +69,6 @@ public class JwtTemplateController {
     }
 
     @GetMapping("/signup")
-
-
     public String signup(UserDto userDto) {
         return "jwt/signup";
     }

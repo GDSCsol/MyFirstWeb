@@ -13,16 +13,14 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void saveTokenInfo(String name, String refreshToken, String accressToken) {
-        refreshTokenRepository.save(new RefreshToken(name, accressToken, refreshToken));
+    public void saveTokenInfo(String name, String accessToken, String refreshToken) {
+        refreshTokenRepository.save(new RefreshToken(name, accessToken, refreshToken));
     }
 
     @Transactional
-    // TODO: 2024-02-27 username으로 지우는 방안 생각해보기 
     public void removeRefreshToken(String accessToken) {
         RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(IllegalAccessError::new);
-        
-        refreshTokenRepository.delete(token);
+
     }
 }

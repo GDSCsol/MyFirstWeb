@@ -1,6 +1,7 @@
 package org.example.security.service;
 
 import lombok.AllArgsConstructor;
+import org.example.security.dto.AccessRefreshTokenDto;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
 import org.example.security.entity.Authority;
@@ -10,6 +11,7 @@ import org.example.security.entity.UserAuthority;
 import org.example.security.exception.DuplicateMemberException;
 import org.example.security.exception.NotFoundMemberException;
 import org.example.security.jwt.TokenProvider;
+import org.example.security.repository.RefreshTokenRepository;
 import org.example.security.repository.UserAuthorityRepository;
 import org.example.security.repository.UserRepository;
 import org.example.security.util.SecurityUtil;
@@ -26,14 +28,17 @@ import java.util.HashSet;
 @AllArgsConstructor
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
     private final UserAuthorityRepository userAuthorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public String login(LoginDto loginDto) {
+    public AccessRefreshTokenDto login(LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getName(), loginDto.getPassword());
 
@@ -41,8 +46,14 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.createAccessToken(authentication);
+        String rft = tokenProvider.createRefreshtoken(authentication);
 
-        return jwt;
+        if (refreshTokenRepository.findByAccessToken(jwt).isPresent()) {
+            refreshTokenService.removeRefreshToken(jwt);
+        }
+        refreshTokenService.saveTokenInfo(loginDto.getName(), jwt, rft);
+
+        return new AccessRefreshTokenDto(jwt, rft);
     }
 
     @Transactional
