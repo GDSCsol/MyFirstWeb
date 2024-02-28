@@ -1,8 +1,5 @@
 package org.example.security.service;
 
-import io.jsonwebtoken.lang.Collections;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
@@ -12,12 +9,10 @@ import org.example.security.entity.User;
 import org.example.security.entity.UserAuthority;
 import org.example.security.exception.DuplicateMemberException;
 import org.example.security.exception.NotFoundMemberException;
-import org.example.security.jwt.JwtFilter;
 import org.example.security.jwt.TokenProvider;
 import org.example.security.repository.UserAuthorityRepository;
 import org.example.security.repository.UserRepository;
 import org.example.security.util.SecurityUtil;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -27,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -46,7 +40,7 @@ public class UserService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        String jwt = tokenProvider.createAccessToken(authentication);
 
         return jwt;
     }

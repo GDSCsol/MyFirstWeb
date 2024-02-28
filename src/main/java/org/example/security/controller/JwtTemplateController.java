@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
+import org.example.security.repository.RefreshTokenRepository;
 import org.example.security.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

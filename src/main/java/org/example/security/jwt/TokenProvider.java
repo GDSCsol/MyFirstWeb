@@ -43,13 +43,32 @@ public class TokenProvider implements InitializingBean {
     }
 
     // Token -> Authentication
-    public String createToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .subject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key)
+                .expiration(validity)
+                .compact();
+    }
+
+    public String createRefreshtoken(Authentication authentication) {
+        // TODO: 2024-02-28 refresh token valiad time 환경변수화
+        long refresPeriod = 1000L * 60L * 60L * 24L * 30; // 30일
+
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + refresPeriod);
 
         return Jwts.builder()
                 .subject(authentication.getName())
