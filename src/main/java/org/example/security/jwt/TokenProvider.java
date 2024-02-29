@@ -112,4 +112,13 @@ public class TokenProvider implements InitializingBean {
         }
         return false;
     }
+
+    public boolean expiredToken(String token) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+        return false;
+    }
 }
