@@ -15,6 +15,7 @@ import org.example.security.repository.RefreshTokenRepository;
 import org.example.security.repository.UserAuthorityRepository;
 import org.example.security.repository.UserRepository;
 import org.example.security.util.SecurityUtil;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -48,12 +49,14 @@ public class UserService {
         String jwt = tokenProvider.createAccessToken(authentication);
         String rft = tokenProvider.createRefreshtoken(authentication);
 
-        if (refreshTokenRepository.findByAccessToken(jwt).isPresent()) {
-            refreshTokenService.removeRefreshToken(jwt);
-        }
         refreshTokenService.saveTokenInfo(loginDto.getName(), jwt, rft);
 
         return new AccessRefreshTokenDto(jwt, rft);
+    }
+
+    @Transactional
+    public void logout(String accessToken) {
+        refreshTokenService.removeRefreshToken(accessToken);
     }
 
     @Transactional

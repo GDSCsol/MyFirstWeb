@@ -22,5 +22,6 @@ public class RefreshTokenService {
         RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(IllegalAccessError::new);
 
+        refreshTokenRepository.delete(token);
     }
 }

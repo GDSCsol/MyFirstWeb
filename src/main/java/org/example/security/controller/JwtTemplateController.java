@@ -9,9 +9,8 @@ import org.example.security.dto.AccessRefreshTokenDto;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
-import org.example.security.repository.RefreshTokenRepository;
+import org.example.security.jwt.JwtUtil;
 import org.example.security.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 
 @Controller
 @AllArgsConstructor
@@ -88,11 +88,19 @@ public class JwtTemplateController {
     }
 
     @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        String jwt = JwtUtil.resolveAccessToken(request);
+        userService.logout(jwt);
+
         // 쿠키 제거
         Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        response.addCookie(cookie);
+
+        cookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/jwt/refresh");
         response.addCookie(cookie);
 
         return "redirect:/";
