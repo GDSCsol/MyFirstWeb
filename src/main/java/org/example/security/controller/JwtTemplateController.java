@@ -10,6 +10,7 @@ import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
 import org.example.security.jwt.JwtUtil;
+import org.example.security.service.RefreshTokenService;
 import org.example.security.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 public class JwtTemplateController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @GetMapping
     public String index() {return "jwt/jwt";}
@@ -65,7 +67,9 @@ public class JwtTemplateController {
         } catch (Exception e) {
             ObjectError error = new ObjectError("loginDto", e.getMessage());
             bindingResult.addError(error);
-        }        return "jwt/login";
+        }
+
+        return "jwt/login";
     }
 
     @GetMapping("/signup")
@@ -103,6 +107,28 @@ public class JwtTemplateController {
         cookie.setPath("/jwt/refresh");
         response.addCookie(cookie);
 
+        return "redirect:/";
+    }
+
+    @PostMapping("/refresh")
+    public String refresh(HttpServletRequest request, HttpServletResponse response) {
+        AccessRefreshTokenDto tokens = refreshTokenService.getNewAccessToken(request);
+
+        String jwt = tokens.getAccessToken();
+        String rft = tokens.getRefreshToken();
+
+        String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
+        Cookie jwtCookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+        // XSS 공격 방지용 http - only 옵션 적용
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        response.addCookie(jwtCookie);
+
+        Cookie rftCookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, rft);
+        // XSS 공격 방지용 http - only 옵션 적용
+        rftCookie.setHttpOnly(true);
+        rftCookie.setPath("/jwt/refresh");
+        response.addCookie(rftCookie);
         return "redirect:/";
     }
 

@@ -4,6 +4,9 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
+import org.example.exception.CustomException;
+import org.example.exception.TokenErrorCode;
+import org.example.exception.UserErrorCode;
 import org.example.security.dto.AccessRefreshTokenDto;
 import org.example.security.dto.LoginDto;
 import org.example.security.dto.UserDto;
@@ -38,8 +41,6 @@ public class UserService {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RefreshTokenService refreshTokenService;
-    private final RefreshTokenRepository refreshTokenRepository;
-
     @Transactional
     public AccessRefreshTokenDto login(LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -90,32 +91,6 @@ public class UserService {
         userRepository.save(user);
         return UserDto.from(userRepository.save(user));
     }
-
-    // todo Access Token 재발급 로직
-//    @Transactional
-//    public UserDto getNewAccessToken(HttpServletRequest request) {
-//        String jwt = JwtUtil.resolveAccessToken(request);
-//        String rft = JwtUtil.resolveRefreshToken(request);
-//        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(jwt)
-//                .orElseThrow(() -> throw new )
-//
-//        if (tokenProvider.expiredToken(jwt) && refreshToken.getRefreshToken().equals(rft)) {
-//            refreshTokenService.removeRefreshToken(jwt);
-//
-//            User user = userRepository.findOneWithAuthoritiesByName(refreshToken.getName()).orElse(null);
-//            if (user)
-//            UsernamePasswordAuthenticationToken authenticationToken =
-//                    new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword());
-//
-//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            String jwt = tokenProvider.createAccessToken(authentication);
-//            String rft = tokenProvider.createRefreshtoken(authentication);
-//
-//            refreshTokenService.saveTokenInfo(loginDto.getName(), jwt, rft);
-//        }
-//    }
 
     @Transactional(readOnly = true)
     public UserDto getUserWithAuthorities(String username) {

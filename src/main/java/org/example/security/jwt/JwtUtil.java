@@ -30,8 +30,9 @@ public class JwtUtil {
             bearerToken = URLDecoder.decode(bearerToken, StandardCharsets.UTF_8);
         }
 
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        if (StringUtils.hasText(bearerToken)) {
+            if (bearerToken.startsWith("Bearer ")) { return bearerToken.substring(7);}
+            return bearerToken;
         }
 
         return null;
