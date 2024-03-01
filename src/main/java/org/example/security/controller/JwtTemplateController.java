@@ -5,56 +5,63 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.example.security.dto.AccessRefreshTokenDto;
 import org.example.security.dto.LoginDto;
-import org.example.security.dto.TokenDto;
 import org.example.security.dto.UserDto;
 import org.example.security.jwt.JwtFilter;
-import org.example.security.jwt.TokenProvider;
+import org.example.security.jwt.JwtUtil;
+import org.example.security.service.RefreshTokenService;
 import org.example.security.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+
 @Controller
 @AllArgsConstructor
-public class AuthTemplateController {
+@RequestMapping("/jwt")
+public class JwtTemplateController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
+
+    @GetMapping
+    public String index() {return "jwt/jwt";}
 
     @GetMapping("/login")
     public String login(LoginDto loginDto) {
-        return "login";
+        return "jwt/login";
     }
 
     @PostMapping("/login")
     public String authorize(@Valid LoginDto loginDto,
                             BindingResult bindingResult,
-                            @Value("${jwt.token-validity-in-seconds}") int tokenValidityInSeconds,
                             HttpServletResponse response) {
         try {
             // 쿠키저장
-            String jwt = userService.login(loginDto);
+            AccessRefreshTokenDto tokens = userService.login(loginDto);
+            String jwt = tokens.getAccessToken();
+            String rft = tokens.getRefreshToken();
+
             String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
-            Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
-            cookie.setMaxAge(tokenValidityInSeconds);
-            response.addCookie(cookie);
+            Cookie jwtCookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+            // XSS 공격 방지용 http - only 옵션 적용
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            response.addCookie(jwtCookie);
+
+            Cookie rftCookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, rft);
+            // XSS 공격 방지용 http - only 옵션 적용
+            rftCookie.setHttpOnly(true);
+            rftCookie.setPath("/jwt/refresh");
+            response.addCookie(rftCookie);
+
             return "redirect:/";
 
         } catch (Exception e) {
@@ -62,12 +69,12 @@ public class AuthTemplateController {
             bindingResult.addError(error);
         }
 
-        return "login";
+        return "jwt/login";
     }
 
     @GetMapping("/signup")
     public String signup(UserDto userDto) {
-        return "signup";
+        return "jwt/signup";
     }
 
     @PostMapping("/signup")
@@ -81,17 +88,47 @@ public class AuthTemplateController {
             bindingResult.addError(error);
         }
 
-        return "signup";
+        return "jwt/signup";
     }
 
     @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        String jwt = JwtUtil.resolveAccessToken(request);
+        userService.logout(jwt);
+
         // 쿠키 제거
         Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
 
+        cookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/jwt/refresh");
+        response.addCookie(cookie);
+
+        return "redirect:/";
+    }
+
+    @PostMapping("/refresh")
+    public String refresh(HttpServletRequest request, HttpServletResponse response) {
+        AccessRefreshTokenDto tokens = refreshTokenService.getNewAccessToken(request);
+
+        String jwt = tokens.getAccessToken();
+        String rft = tokens.getRefreshToken();
+
+        String cookieValue = URLEncoder.encode("Bearer " + jwt, StandardCharsets.UTF_8);
+        Cookie jwtCookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, cookieValue);
+        // XSS 공격 방지용 http - only 옵션 적용
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        response.addCookie(jwtCookie);
+
+        Cookie rftCookie = new Cookie(JwtFilter.REFRESH_TOKEN_HEADER, rft);
+        // XSS 공격 방지용 http - only 옵션 적용
+        rftCookie.setHttpOnly(true);
+        rftCookie.setPath("/jwt/refresh");
+        response.addCookie(rftCookie);
         return "redirect:/";
     }
 

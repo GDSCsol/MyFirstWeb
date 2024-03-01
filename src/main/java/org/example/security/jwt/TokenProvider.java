@@ -43,13 +43,32 @@ public class TokenProvider implements InitializingBean {
     }
 
     // Token -> Authentication
-    public String createToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .subject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key)
+                .expiration(validity)
+                .compact();
+    }
+
+    public String createRefreshtoken(Authentication authentication) {
+        // TODO: 2024-02-28 refresh token valiad time 환경변수화
+        long refresPeriod = 1000L * 60L * 60L * 24L * 30; // 30일
+
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + refresPeriod);
 
         return Jwts.builder()
                 .subject(authentication.getName())
@@ -90,6 +109,15 @@ public class TokenProvider implements InitializingBean {
             logger.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
             logger.info("JWT 토큰이 잘못되었습니다.");
+        }
+        return false;
+    }
+
+    public boolean expiredToken(String token) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            return true;
         }
         return false;
     }

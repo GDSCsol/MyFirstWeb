@@ -4,28 +4,27 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="card-title text-center">Login</h5>
+                    <h5 class="card-title text-center">Sign Up</h5>
                 </div>
                 <div class="card-body">
-
-                    <form method="post" th:action="@{/login}" th:object="${loginDto}">
+                    <form method="post" th:action="@{/jwt/signup}" th:object="${userDto}">
                         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
+                            <label class="form-label">Name</label>
                             <input type="text" class="form-control" th:field="*{name}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                            <label class="form-label">Nickname</label>
+                            <input type="text" class="form-control" th:field="*{nickname}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
                             <input type="password" class="form-control" th:field="*{password}" required>
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
                         </div>
                     </form>
-
-                    <!-- 디버깅용 로그아웃버튼 -->
-                    <form method="post" th:action="@{/logout}"><button type="submit" class="btn btn-primary btn-block">로그아웃</button> </form>
-
                 </div>
             </div>
         </div>

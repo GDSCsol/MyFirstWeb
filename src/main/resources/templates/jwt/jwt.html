@@ -1,0 +1,9 @@
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<div layout:fragment="content" class="container mt-5">
+    <h1>JWT</h1>
+    <a th:href="@{/jwt/login}">login</a>
+    <a th:href="@{/jwt/signup}">signup</a>
+    <form method="post" th:action="@{jwt/logout}"><button type="submit" class="btn btn-primary btn-block">로그아웃</button> </form>
+    <form method="post" th:action="@{jwt/refresh}"><button type="submit" class="btn btn-primary btn-block">AccessToken 재발급</button> </form>
+</div>
+</html>
